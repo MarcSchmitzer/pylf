@@ -42,7 +42,7 @@ def includeme(config):
     config.add_static_view('icons', icons.path)
 
     def icon_path(request, mimetype):
-        mimetype, encoding = mimetype
+        mimetype, _encoding = mimetype
         if mimetype:
             fname = icons.for_mimetype(mimetype)
         else:

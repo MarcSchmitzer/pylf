@@ -6,7 +6,7 @@ Provides the `File` resource and corresponding view.
 from pyramid.response import FileResponse
 
 
-class File(object):
+class File:
     """Resource representing files."""
     def __init__(self, path):
         self.path = path

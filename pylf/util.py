@@ -3,25 +3,25 @@
 from jinja2 import Markup
 
 
-_size_suffixes = ("B", "KB", "MB", "GB", "TB", "PB")
+_SIZE_SUFFIXES = ("B", "KB", "MB", "GB", "TB", "PB")
 
 
-def fmt_size(sz):
-    """Generate a human-readable representation of the bytes value `sz`.
+def fmt_size(size):
+    """Generate a human-readable representation of the bytes value `size`.
 
     Converts the value to largest sensible unit and returns a string
     containing the value rounded to reasonable precision and the unit.
 
-    Returns an empty string if `sz` is `None`.
+    Returns an empty string if `size` is `None`.
     """
-    if sz is None:
+    if size is None:
         return ""
-    i = iter(_size_suffixes)
+    i = iter(_SIZE_SUFFIXES)
     sfx = next(i)
-    while sz > 1024:
-        sz /= 1024.0
+    while size > 1024:
+        size /= 1024.0
         sfx = next(i)
-    return Markup("{:g}&nbsp;{:s}".format(round(sz, 2), sfx))
+    return Markup("{:g}&nbsp;{:s}".format(round(size, 2), sfx))
 
 
 def includeme(config):

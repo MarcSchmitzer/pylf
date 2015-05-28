@@ -14,14 +14,14 @@ from .directory import Mount
 class Mounts(dict):
     @classmethod
     def from_settings(cls, settings):
-        mounts = cls()
+        res = cls()
         for path in aslist(settings.get("mounts_directories", "")):
             for entry in os.listdir(path):
                 epath = os.path.join(path, entry)
                 if entry.endswith(".conf") and os.path.isfile(epath):
                     mount = Mount.from_file(epath)
-                    mounts[mount.name] = mount
-        return mounts
+                    res[mount.name] = mount
+        return res
 
 
 def mounts(request):

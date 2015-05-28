@@ -34,9 +34,6 @@ def root(request):
 
 
 def includeme(config):
-    r = Root(config.get_settings())
-    config.set_root_factory(lambda _request: r)
-    config.add_view(
-        root,
-        context=Root, 
-    )
+    root_obj = Root(config.get_settings())
+    config.set_root_factory(lambda _request: root_obj)
+    config.add_view(root, context=Root)

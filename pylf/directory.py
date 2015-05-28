@@ -16,7 +16,7 @@ from pyramid.settings import asbool
 from .file import File
 
 
-class Directory(object):
+class Directory:
     """Resource type for directories.
 
     Child resources are either instances of this class or `file.File`.
@@ -44,6 +44,7 @@ class Mount(Directory):
 
     @classmethod
     def from_file(cls, path):
+        """Create an instance based on the configuration file at `path`."""
         name = os.path.basename(path).split(".", 1)[0]
         cfg = SafeConfigParser()
         cfg.read([path])
