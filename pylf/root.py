@@ -20,7 +20,7 @@ class Root(dict):
     def __init__(self, settings):
         dict.__init__(
             self,
-            mounts = Mounts.from_settings(settings),
+            mounts=Mounts.from_settings(settings),
         )
 
 

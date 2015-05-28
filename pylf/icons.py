@@ -48,5 +48,5 @@ def includeme(config):
         else:
             fname = "unknown.png"
         return request.route_path("__icons/", subpath=fname)
-    
+
     config.add_request_method(icon_path)

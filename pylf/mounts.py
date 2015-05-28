@@ -33,6 +33,6 @@ def mounts(request):
 def includeme(config):
     config.add_view(
         mounts,
-        context=Mounts, 
+        context=Mounts,
         renderer="templates/mounts.jinja2",
     )

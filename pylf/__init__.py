@@ -21,7 +21,7 @@ def main(global_config, **settings):  # pylint: disable=unused-argument
         property=True,
         reify=True,
     )
-        
+
     config.add_static_view('static', 'static')
     config.commit()
 
@@ -31,13 +31,13 @@ def main(global_config, **settings):  # pylint: disable=unused-argument
     config.include(".file")
     config.include(".util")
     config.include(".icons")
-    
+
     return config.make_wsgi_app()
 
 
 class LocaleNegotiator:
     """Locale negotiator that supports the "Accept-Language" HTTP
-    header. 
+    header.
     """
     @classmethod
     def from_settings(cls, settings):
@@ -54,7 +54,7 @@ class LocaleNegotiator:
         """
         locales = list(Accept.parse(settings.get("locales", "")))
         return cls(locales)
-    
+
     def __init__(self, locales):
         """Constructor.
 

@@ -18,7 +18,7 @@ from .file import File
 
 class Directory(object):
     """Resource type for directories.
-    
+
     Child resources are either instances of this class or `file.File`.
     """
     is_root = False
@@ -39,7 +39,7 @@ class Directory(object):
 
 
 class Mount(Directory):
-    """Resource type for the top-level directory of a mount.""" 
+    """Resource type for the top-level directory of a mount."""
     is_root = True
 
     @classmethod
@@ -48,7 +48,7 @@ class Mount(Directory):
         cfg = SafeConfigParser()
         cfg.read([path])
         return cls(name, dict(cfg.items("general")))
-    
+
     def __init__(self, name, cfg):
         Directory.__init__(self, os.path.expanduser(cfg["path"]))
         self.name = name

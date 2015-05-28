@@ -27,5 +27,5 @@ def includeme(config):
     """
     config.add_view(
         file_,
-        context=File, 
+        context=File,
     )
