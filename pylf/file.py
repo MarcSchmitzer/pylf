@@ -8,8 +8,9 @@ from pyramid.response import FileResponse
 
 class File:
     """Resource representing files."""
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, dentry, backend):
+        self.dentry = dentry
+        self.backend = backend
 
 
 def file_(context, request):
@@ -17,7 +18,7 @@ def file_(context, request):
 
     Returns the contents of the file.
     """
-    return FileResponse(context.path, request=request)
+    return FileResponse(context.dentry.path, request=request)
 
 
 def includeme(config):

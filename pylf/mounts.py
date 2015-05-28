@@ -23,6 +23,9 @@ class Mounts(dict):
                     res[mount.name] = mount
         return res
 
+    def __repr__(self):
+        return "{}({})".format(type(self).__name__, dict.__repr__(self))
+
 
 def mounts(request):
     return {

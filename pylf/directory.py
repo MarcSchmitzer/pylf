@@ -5,15 +5,16 @@ corresponding view.
 """
 
 import os
-import stat
 
 from configparser import SafeConfigParser
-from mimetypes import guess_type
 from urllib.parse import urlparse, ParseResult
 
 from pyramid.httpexceptions import HTTPNotFound, HTTPSeeOther
 from pyramid.settings import asbool
+
+from .dentry import DirectoryDentry
 from .file import File
+from .plugins import Plugins
 
 
 class Directory:
@@ -23,24 +24,33 @@ class Directory:
     """
     is_root = False
 
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, dentry, backend):
+        self.dentry = dentry
+        self.backend = backend
+
+    def __repr__(self):
+        return "{}({!r})".format(type(self).__name__, self.dentry)
 
     def __getitem__(self, key):
-        path = os.path.join(self.path, key)
         try:
-            stat_res = os.stat(path, follow_symlinks=False)
+            dentry = self.dentry.get_child(key)
         except FileNotFoundError:
-            raise HTTPNotFound(path)
+            raise HTTPNotFound(key)
 
-        if stat_res.st_mode & stat.S_IFDIR:
-            return Directory(path)
-        return File(path)
+        if isinstance(dentry, DirectoryDentry):
+            return Directory(dentry, backend=self.backend)
+        return File(dentry, backend=self.backend)
+
+    @property
+    def path(self):
+        """The path of the directory."""
+        return self.dentry.path
 
 
 class Mount(Directory):
     """Resource type for the top-level directory of a mount."""
     is_root = True
+    backends = Plugins("pylf.backends")
 
     @classmethod
     def from_file(cls, path):
@@ -51,74 +61,14 @@ class Mount(Directory):
         return cls(name, dict(cfg.items("general")))
 
     def __init__(self, name, cfg):
-        Directory.__init__(self, os.path.expanduser(cfg["path"]))
-        self.name = name
-        self.config = cfg
-
-
-class Dentry(object):
-    """Represents a directory entry during rendering of a
-    directory."""
-    
-    def __init__(self, name, stat_result):
-        self.name = name
-        self.stat_result = stat_result
-
-    @property
-    def hidden(self):
-        return self.name.startswith(".")
-
-        
-class FileDentry(Dentry):
-    """Represents a file during rendering of a directory."""
-    
-    type = "file"
-
-    _mimetype = None
-    _size = None
-    
-    @property
-    def relpath(self):
-        return self.name
-    
-    @property
-    def mimetype(self):
-        if self._mimetype is None:
-            self._mimetype = guess_type(self.name, strict=False)
-        return self._mimetype
-
-    @property
-    def size(self):
-        return self.stat_result.st_size
-
-
-class DirectoryDentry(Dentry):
-    """Represents a subdirectory during rendering of a directory."""
-
-    type = "directory"
-    mimetype = ("inode/directory", None)
-    size = None
-
-    @property
-    def relpath(self):
-        return self.name + "/"
-
-
-def dentries(path):
-    """Generates `Dentry` instances for the children of `path`.
-    """
-    for item in sorted(os.listdir(path), key=lambda s: s.lower()):
-        ipath = os.path.join(path, item)
-        st = os.stat(ipath)
-        if st.st_mode & stat.S_IFDIR:
-            cls = DirectoryDentry
-        else:
-            cls = FileDentry
-
-        yield cls(
-            name=item,
-            stat_result=st,
+        backend = self.backends[cfg["backend"]]
+        Directory.__init__(
+            self,
+            backend.get_dentry(cfg["path"]),
+            backend,
         )
+        self.config = cfg
+        self.name = name
 
 
 def directory(context, request):
@@ -140,7 +90,7 @@ def directory(context, request):
         raise HTTPSeeOther(url.geturl())
     return {
         'path': context.path,
-        'dentries': dentries(context.path),
+        'dentries': context.backend.listdir(context.path),
         'show_hidden': asbool(request.params.get('show_hidden')),
     }
 
