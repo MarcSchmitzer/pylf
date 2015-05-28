@@ -1,0 +1,7 @@
+{% macro dentry_icon(request, dentry) -%}
+<img class="dentry_icon" src="{{ request.icon_path(dentry.mimetype) }}">
+{%- endmacro %}
+
+{% macro stylesheet(request, name) -%}
+<link rel="stylesheet" type="text/css" href="{{ request.static_path('pylf:static/' + name + '.css') }}">
+{%- endmacro %}

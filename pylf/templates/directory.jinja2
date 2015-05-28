@@ -1,0 +1,36 @@
+{% import 'macros.jinja2' as macros %}
+<!DOCTYPE html>
+<html lang="{{request.locale_name}}">
+  <head>
+    {{ macros.stylesheet(request, 'default') }}
+    <title>PYLF - Directory</title>
+  </head>
+  <body>
+    <div class="content">
+      <h1>{{ path }}</h1>
+      <p><a href="../">
+          {%- if context.is_root -%}
+          {{ _("Mounts") }}
+          {%- else -%}
+          {{ _("Parent Directory") }}
+          {%- endif -%}
+      </a></p>
+      <table id="dentries_table">
+        <tr>
+          <th></th>
+          <th>{{ _("Name") }}</th>
+          <th>{{ _("Size") }}</th>
+        </tr>
+        {%- for dentry in dentries -%}
+	{%- if show_hidden or not dentry.hidden %}
+        <tr class="{{ loop.cycle('dentry_odd_row', 'dentry_even_row') }}">
+          <td>{{ macros.dentry_icon(request, dentry) }}</td>
+          <td class="dentry_name_col"><a href="{{dentry.relpath}}">{{ dentry.name }}</a></td>
+          <td class="dentry_size_col">{{ dentry.size|fmt_size }}</td>
+        </tr>
+	{%- endif -%}
+        {%- endfor -%}
+      </table>
+    </div>
+  </body>
+</html>

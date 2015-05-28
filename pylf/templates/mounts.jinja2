@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="{{request.locale_name}}">
+  <head>
+    <title>PYLF - Mounts</title>
+  </head>
+  <body>
+    <h1>PYLF - Mounts</h1>
+    <ul>
+      {% for name, info in mounts.items() -%}
+      <li><a href="{{name}}/">{{ name }}</a></li>
+      {% endfor -%}
+    </ul>
+  </body>
+</html>

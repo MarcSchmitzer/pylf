@@ -1,0 +1,25 @@
+
+body {
+    font-family: sans-serif;
+}
+
+.content {
+    width: 80%;
+    margin: auto;
+}
+
+#dentries_table {
+    border-collapse: collapse;
+}
+
+.dentry_size_col {
+    text-align: right;
+}
+
+.dentry_name_col {
+    width: 100%;
+}
+
+.dentry_odd_row {
+    background-color: #EEEEEE;
+}
