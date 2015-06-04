@@ -56,9 +56,16 @@ class Mount(Directory):
     def from_file(cls, path):
         """Create an instance based on the configuration file at `path`."""
         name = os.path.basename(path).split(".", 1)[0]
-        cfg = SafeConfigParser()
-        cfg.read([path])
-        return cls(name, dict(cfg.items("general")))
+        parser = SafeConfigParser()
+        parser.read([path])
+        cfg = {}
+        for section in parser.sections():
+            items = parser.items(section)
+            if section == "general":
+                cfg.update(items)
+            else:
+                cfg[section] = dict(items)
+        return cls(name, cfg)
 
     def __init__(self, name, cfg):
         backend = self.backends[cfg["backend"]]
