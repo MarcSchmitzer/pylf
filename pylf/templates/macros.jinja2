@@ -5,3 +5,7 @@
 {% macro stylesheet(request, name) -%}
 <link rel="stylesheet" type="text/css" href="{{ request.static_path('pylf:static/' + name + '.css') }}">
 {%- endmacro %}
+
+{% macro favicon(request) -%}
+<link rel="icon" type="image/png" href="{{ request.icon_path(('inode/directory', None)) }}">
+{%- endmacro %}
