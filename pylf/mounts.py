@@ -9,22 +9,34 @@ import os
 
 from pyramid.settings import aslist
 
-from .directory import Mount
+from .directory import Directory
+from .mount import Mount
 
-class Mounts(dict):
+
+class Mounts:
     @classmethod
     def from_settings(cls, settings):
-        res = cls()
+        res = {}
         for path in aslist(settings.get("mounts_directories", "")):
             for entry in os.listdir(path):
                 epath = os.path.join(path, entry)
                 if entry.endswith(".conf") and os.path.isfile(epath):
                     mount = Mount.from_file(epath)
                     res[mount.name] = mount
-        return res
+        return cls(res)
+
+    def __init__(self, items):
+        self._items = items
 
     def __repr__(self):
-        return "{}({})".format(type(self).__name__, dict.__repr__(self))
+        return "{}({!r})".format(type(self).__name__, self._items)
+
+    def __getitem__(self, key):
+        mount = self._items[key]
+        return Directory(mount=mount)
+
+    def items(self):
+        return self._items.items()
 
 
 def mounts(request):

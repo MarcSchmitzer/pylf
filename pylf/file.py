@@ -8,9 +8,9 @@ from pyramid.response import FileResponse
 
 class File:
     """Resource representing files."""
-    def __init__(self, dentry, backend):
+    def __init__(self, mount, dentry):
+        self.mount = mount
         self.dentry = dentry
-        self.backend = backend
 
 
 def file_(context, request):

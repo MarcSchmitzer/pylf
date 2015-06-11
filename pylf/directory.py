@@ -4,9 +4,6 @@ Provides the `Directory` resource and its subtype `Mount` and a
 corresponding view.
 """
 
-import os
-
-from configparser import SafeConfigParser
 from urllib.parse import urlparse, ParseResult
 
 from pyramid.httpexceptions import HTTPNotFound, HTTPSeeOther
@@ -14,7 +11,6 @@ from pyramid.settings import asbool
 
 from .dentry import DirectoryDentry
 from .file import File
-from .plugins import Plugins
 
 
 class Directory:
@@ -24,9 +20,12 @@ class Directory:
     """
     is_root = False
 
-    def __init__(self, dentry, backend):
+    def __init__(self, mount, dentry=None):
+        self.mount = mount
+        if not dentry:
+            self.is_root = True
+            dentry = mount.root
         self.dentry = dentry
-        self.backend = backend
 
     def __repr__(self):
         return "{}({!r})".format(type(self).__name__, self.dentry)
@@ -38,44 +37,13 @@ class Directory:
             raise HTTPNotFound(key)
 
         if isinstance(dentry, DirectoryDentry):
-            return Directory(dentry, backend=self.backend)
-        return File(dentry, backend=self.backend)
+            return Directory(self.mount, dentry)
+        return File(self.mount, dentry)
 
     @property
     def path(self):
         """The path of the directory."""
         return self.dentry.path
-
-
-class Mount(Directory):
-    """Resource type for the top-level directory of a mount."""
-    is_root = True
-    backends = Plugins("pylf.backends")
-
-    @classmethod
-    def from_file(cls, path):
-        """Create an instance based on the configuration file at `path`."""
-        name = os.path.basename(path).split(".", 1)[0]
-        parser = SafeConfigParser()
-        parser.read([path])
-        cfg = {}
-        for section in parser.sections():
-            items = parser.items(section)
-            if section == "general":
-                cfg.update(items)
-            else:
-                cfg[section] = dict(items)
-        return cls(name, cfg)
-
-    def __init__(self, name, cfg):
-        backend = self.backends[cfg["backend"]]
-        Directory.__init__(
-            self,
-            backend.get_dentry(cfg["path"]),
-            backend,
-        )
-        self.config = cfg
-        self.name = name
 
 
 def directory(context, request):
@@ -97,7 +65,7 @@ def directory(context, request):
         raise HTTPSeeOther(url.geturl())
     return {
         'path': context.path,
-        'dentries': context.backend.listdir(context.path),
+        'dentries': context.mount.backend.listdir(context.path),
         'show_hidden': asbool(request.params.get('show_hidden')),
     }
 
