@@ -3,7 +3,13 @@ from importlib import import_module
 
 
 class Plugins:
-    """Plugin-module loader."""
+    """Plugin loader.
+
+    Supports loading plugins by module name from a package or globally.
+
+    Plugins are either the modules themselves or an member of the module,
+    whose name is specified in the "__plugin__" attribute.
+    """
 
     def __init__(self, package=None):
         """Constructor.
@@ -24,4 +30,7 @@ class Plugins:
         """Get the plugin `name`."""
         if self.package:
             name = "." + name
-        return import_module(name, package=self.package)
+        res = import_module(name, package=self.package)
+        if hasattr(res, "__plugin__"):
+            res = getattr(res, res.__plugin__)
+        return res
