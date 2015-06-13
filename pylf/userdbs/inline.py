@@ -27,14 +27,3 @@ class InlineUserDB(dict):
         if digest.digest() != b64decode(pw["hash"]):
             return None
         return account
-
-
-
-if __name__ == "__main__":
-    import sys
-    from configparser import SafeConfigParser
-    cfg = SafeConfigParser()
-    cfg.readfp(open(sys.argv[1], "r"))
-    db = InlineUserDB.from_config(cfg["userdb"])
-    print(db.authenticate(sys.argv[2], sys.argv[3]))
-
