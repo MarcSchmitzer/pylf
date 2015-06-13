@@ -4,6 +4,18 @@ from pyramid.httpexceptions import HTTPForbidden, HTTPUnauthorized
 from pyramid.security import forget
 
 
+class AuthnPolicy(BasicAuthAuthenticationPolicy):
+    def __init__(self):
+        BasicAuthAuthenticationPolicy.__init__(
+            self,
+            check=check_auth,
+        )
+
+    def forget(self, request):
+        realm = request.context.mount.auth_realm
+        return [('WWW-Authenticate', 'Basic realm="%s"' % realm)]
+
+
 def check_auth(username, password, request):
     userdb = request.context.mount.userdb
     if userdb.authenticate(username, password):
@@ -27,9 +39,5 @@ def includeme(config):
         forbidden_view,
         context=HTTPForbidden,
     )
-    authn_policy = BasicAuthAuthenticationPolicy(
-        check=check_auth,
-        realm="PYLF",
-    )
     config.set_authorization_policy(AuthzPolicy())
-    config.set_authentication_policy(authn_policy)
+    config.set_authentication_policy(AuthnPolicy())

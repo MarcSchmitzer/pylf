@@ -32,6 +32,7 @@ class Mount:
         self.config = cfg
         self.name = name
         self.root = self.backend.get_dentry(cfg["path"])
+        self.auth_realm = cfg["auth"]["realm"]
         userdb_cfg = cfg["userdb"]
         userdb_cls = self.userdbs[userdb_cfg["type"]]
         self.userdb = userdb_cls.from_config(userdb_cfg)
