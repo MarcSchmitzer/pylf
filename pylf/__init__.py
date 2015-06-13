@@ -26,6 +26,7 @@ def main(global_config, **settings):  # pylint: disable=unused-argument
     config.add_static_view('static', 'static')
     config.commit()
 
+    config.include(".auth")
     config.include(".root")
     config.include(".mounts")
     config.include(".directory")
