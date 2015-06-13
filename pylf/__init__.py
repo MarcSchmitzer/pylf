@@ -4,7 +4,6 @@ from pyramid.config import Configurator
 from pyramid.i18n import default_locale_negotiator
 from webob.acceptparse import Accept
 
-from .backends import fs
 
 def main(global_config, **settings):  # pylint: disable=unused-argument
     """Main function of the application."""
