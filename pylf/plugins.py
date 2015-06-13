@@ -17,6 +17,9 @@ class Plugins:
         if self.package:
             import_module(self.package)
 
+    def __repr__(self):
+        return "{}({!r})".format(type(self).__name__, self.package)
+
     def __getitem__(self, name):
         """Get the plugin `name`."""
         if self.package:
