@@ -10,6 +10,7 @@ class Mount:
     """Represents a single configured mount."""
 
     backends = Plugins("pylf.backends")
+    userdbs = Plugins("pylf.userdbs")
 
     @classmethod
     def from_file(cls, path):
@@ -31,3 +32,6 @@ class Mount:
         self.config = cfg
         self.name = name
         self.root = self.backend.get_dentry(cfg["path"])
+        userdb_cfg = cfg["userdb"]
+        userdb_cls = self.userdbs[userdb_cfg["type"]]
+        self.userdb = userdb_cls.from_config(userdb_cfg)
