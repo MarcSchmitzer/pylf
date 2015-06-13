@@ -79,4 +79,5 @@ def includeme(config):
         directory,
         context=Directory,
         renderer="templates/directory.jinja2",
+        permission="browse",
     )
