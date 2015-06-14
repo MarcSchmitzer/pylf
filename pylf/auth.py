@@ -1,7 +1,7 @@
 
 from pyramid.authentication import BasicAuthAuthenticationPolicy
 from pyramid.httpexceptions import HTTPForbidden, HTTPUnauthorized
-from pyramid.security import forget
+from pyramid.security import forget, Authenticated
 
 
 class AuthnPolicy(BasicAuthAuthenticationPolicy):
@@ -25,7 +25,7 @@ def check_auth(username, password, request):
 
 class AuthzPolicy:
     def permits(self, context, principals, permission):
-        return True  # FIXME
+        return (Authenticated in principals)   # FIXME
 
 
 def forbidden_view(request):
