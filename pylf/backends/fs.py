@@ -7,8 +7,6 @@ owned by the user running the application.
 import os
 import stat
 
-from mimetypes import guess_type
-
 from .. import dentry
 
 
@@ -25,21 +23,9 @@ class FSDentryMixin:
 class FileDentry(dentry.FileDentry, FSDentryMixin):
     """Represents a file during rendering of a directory."""
 
-    _mimetype = None
-
     def __init__(self, path, stat_result):
         dentry.FileDentry.__init__(self, path)
         self.stat_result = stat_result
-
-    @property
-    def relpath(self):
-        return self.name
-
-    @property
-    def mimetype(self):
-        if self._mimetype is None:
-            self._mimetype = guess_type(self.name, strict=False)
-        return self._mimetype
 
     @property
     def size(self):
@@ -48,10 +34,6 @@ class FileDentry(dentry.FileDentry, FSDentryMixin):
 
 class DirectoryDentry(dentry.DirectoryDentry, FSDentryMixin):
     """Represents a subdirectory during rendering of a directory."""
-
-    @property
-    def relpath(self):
-        return self.name + "/"
 
     def get_child(self, name):
         return get_dentry(os.path.join(self.path, name))
