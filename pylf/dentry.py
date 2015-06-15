@@ -3,8 +3,9 @@ from mimetypes import guess_type
 
 
 class Dentry:
-    def __init__(self, path):
+    def __init__(self, path, size=None):
         self.path = path
+        self.size = size
 
     def __repr__(self):
         return "{}({!r})".format(type(self).__name__, self.path)
@@ -26,7 +27,6 @@ class FileDentry(Dentry):
 
 class DirectoryDentry(Dentry):
     mimetype = ("inode/directory", None)
-    size = None
 
     @property
     def relpath(self):

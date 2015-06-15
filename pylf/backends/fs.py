@@ -23,14 +23,6 @@ class FSDentryMixin:
 class FileDentry(dentry.FileDentry, FSDentryMixin):
     """Represents a file during rendering of a directory."""
 
-    def __init__(self, path, stat_result):
-        dentry.FileDentry.__init__(self, path)
-        self.stat_result = stat_result
-
-    @property
-    def size(self):
-        return self.stat_result.st_size
-
 
 class DirectoryDentry(dentry.DirectoryDentry, FSDentryMixin):
     """Represents a subdirectory during rendering of a directory."""
@@ -51,4 +43,4 @@ def get_dentry(path):
     stat_res = os.stat(path, follow_symlinks=False)
     if stat_res.st_mode & stat.S_IFDIR:
         return DirectoryDentry(path)
-    return FileDentry(path, stat_res)
+    return FileDentry(path, stat_res.st_size)
