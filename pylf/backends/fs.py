@@ -10,11 +10,11 @@ import stat
 from .. import dentry
 
 
-def listdir(path):
+def listdir(dentry):
     """Generates `Dentry` instances for the children of `path`.
     """
-    for item in sorted(os.listdir(path), key=lambda s: s.lower()):
-        yield get_dentry(os.path.join(path, item))
+    for item in sorted(os.listdir(dentry.path), key=lambda s: s.lower()):
+        yield get_dentry(os.path.join(dentry.path, item))
 
 
 def get_child(dentry, name):

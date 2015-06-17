@@ -65,7 +65,7 @@ def directory(context, request):
         raise HTTPSeeOther(url.geturl())
     return {
         'dentry': context.dentry,
-        'children': context.mount.backend.listdir(context.path),
+        'children': context.mount.backend.listdir(context.dentry),
         'show_hidden': asbool(request.params.get('show_hidden')),
     }
 
