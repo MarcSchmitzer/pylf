@@ -32,7 +32,7 @@ class Directory:
 
     def __getitem__(self, key):
         try:
-            dentry = self.dentry.get_child(key)
+            dentry = self.mount.backend.get_child(self.dentry, key)
         except FileNotFoundError:
             raise HTTPNotFound(key)
 

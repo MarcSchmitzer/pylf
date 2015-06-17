@@ -10,13 +10,6 @@ import stat
 from .. import dentry
 
 
-class DirectoryDentry(dentry.DirectoryDentry):
-    """Represents a subdirectory during rendering of a directory."""
-
-    def get_child(self, name):
-        return get_dentry(os.path.join(self.path, name))
-
-
 def listdir(path):
     """Generates `Dentry` instances for the children of `path`.
     """
@@ -24,9 +17,13 @@ def listdir(path):
         yield get_dentry(os.path.join(path, item))
 
 
+def get_child(dentry, name):
+    return get_dentry(os.path.join(dentry.path, name))
+
+
 def get_dentry(path):
     path = os.path.expanduser(path)
     stat_res = os.stat(path, follow_symlinks=False)
     if stat_res.st_mode & stat.S_IFDIR:
-        return DirectoryDentry(path)
+        return dentry.DirectoryDentry(path)
     return dentry.FileDentry(path, stat_res.st_size)
