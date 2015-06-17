@@ -10,21 +10,7 @@ import stat
 from .. import dentry
 
 
-class FSDentryMixin:
-    @property
-    def name(self):
-        return os.path.split(self.path)[1]
-
-    @property
-    def hidden(self):
-        return self.name.startswith(".")
-
-
-class FileDentry(dentry.FileDentry, FSDentryMixin):
-    """Represents a file during rendering of a directory."""
-
-
-class DirectoryDentry(dentry.DirectoryDentry, FSDentryMixin):
+class DirectoryDentry(dentry.DirectoryDentry):
     """Represents a subdirectory during rendering of a directory."""
 
     def get_child(self, name):
@@ -43,4 +29,4 @@ def get_dentry(path):
     stat_res = os.stat(path, follow_symlinks=False)
     if stat_res.st_mode & stat.S_IFDIR:
         return DirectoryDentry(path)
-    return FileDentry(path, stat_res.st_size)
+    return dentry.FileDentry(path, stat_res.st_size)

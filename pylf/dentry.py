@@ -10,6 +10,14 @@ class Dentry:
     def __repr__(self):
         return "{}({!r})".format(type(self).__name__, self.path)
 
+    @property
+    def name(self):
+        return self.path.rsplit('/', 1)[-1]
+
+    @property
+    def hidden(self):
+        return self.name.startswith(".")
+
 
 class FileDentry(Dentry):
     _mimetype = None
