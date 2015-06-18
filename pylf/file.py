@@ -3,13 +3,9 @@
 Provides the `File` resource and corresponding view.
 """
 
-from pyramid.response import FileResponse
-
-
 class File:
     """Resource representing files."""
-    def __init__(self, mount, dentry):
-        self.mount = mount
+    def __init__(self, dentry):
         self.dentry = dentry
 
 
@@ -18,7 +14,7 @@ def file_(context, request):
 
     Returns the contents of the file.
     """
-    return FileResponse(context.dentry.path, request=request)
+    return context.dentry.make_response(request)
 
 
 def includeme(config):

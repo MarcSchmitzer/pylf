@@ -4,6 +4,7 @@ Provides the `Directory` resource and its subtype `Mount` and a
 corresponding view.
 """
 
+from pathlib import PurePath as Path
 from urllib.parse import urlparse, ParseResult
 
 from pyramid.httpexceptions import HTTPNotFound, HTTPSeeOther
@@ -18,27 +19,30 @@ class Directory:
 
     Child resources are either instances of this class or `file.File`.
     """
-    is_root = False
-
-    def __init__(self, mount, dentry=None):
-        self.mount = mount
-        if not dentry:
-            self.is_root = True
-            dentry = mount.root
+    def __init__(self, dentry):
         self.dentry = dentry
+        self.is_root = (self.dentry.path == Path())
 
     def __repr__(self):
         return "{}({!r})".format(type(self).__name__, self.dentry)
 
     def __getitem__(self, key):
         try:
-            dentry = self.mount.backend.get_child(self.dentry, key)
+            dentry = self.dentry.get_child(key)
         except FileNotFoundError:
             raise HTTPNotFound(key)
 
         if isinstance(dentry, DirectoryDentry):
-            return Directory(self.mount, dentry)
-        return File(self.mount, dentry)
+            return Directory(dentry)
+        return File(dentry)
+
+    @property
+    def name(self):
+        return (
+            self.dentry.mount.name
+            if self.is_root
+            else self.dentry.path.name
+        )
 
     @property
     def path(self):
@@ -65,7 +69,7 @@ def directory(context, request):
         raise HTTPSeeOther(url.geturl())
     return {
         'dentry': context.dentry,
-        'children': context.mount.backend.listdir(context.dentry),
+        'children': context.dentry.listdir(),
         'show_hidden': asbool(request.params.get('show_hidden')),
     }
 

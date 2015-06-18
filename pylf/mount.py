@@ -18,21 +18,21 @@ class Mount:
         name = os.path.basename(path).split(".", 1)[0]
         parser = SafeConfigParser()
         parser.read([path])
-        cfg = {}
-        for section in parser.sections():
-            items = parser.items(section)
-            if section == "general":
-                cfg.update(items)
-            else:
-                cfg[section] = dict(items)
+        cfg = {
+            section: dict(parser.items(section))
+            for section in parser.sections()
+        }
         return cls(name, cfg)
 
     def __init__(self, name, cfg):
-        self.backend = self.backends[cfg["backend"]]
-        self.config = cfg
         self.name = name
-        self.root = self.backend.get_dentry(cfg["path"])
+
+        backend_cfg = cfg["backend"]
+        backend_cls = self.backends[backend_cfg["type"]]
+        self.backend = backend_cls.from_config(backend_cfg)
+
         self.auth_realm = cfg["auth"]["realm"]
+
         userdb_cfg = cfg["userdb"]
         userdb_cls = self.userdbs[userdb_cfg["type"]]
         self.userdb = userdb_cls.from_config(userdb_cfg)
