@@ -70,7 +70,6 @@ def directory(context, request):
 
     parents = []
     parent_parts = [
-        "Mounts",
         context.dentry.mount.name
     ]
     parent_parts.extend(context.dentry.path.parts[:-1])
@@ -80,6 +79,7 @@ def directory(context, request):
 
     return {
         'dentry': context.dentry,
+        'mounts_ref': "../" * (num_parents+1),
         'parents': parents,
         'children': context.dentry.listdir(),
         'show_hidden': asbool(request.params.get('show_hidden')),
