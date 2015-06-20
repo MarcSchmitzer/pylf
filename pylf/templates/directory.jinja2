@@ -9,13 +9,11 @@
   <body>
     <div class="content">
       <h1><img src="{{ request.icon_path(('inode/directory', None)) }}">&nbsp;{{ context.name }}</h1>
-      <p><a href="../">
-          {%- if context.is_root -%}
-          {{ _("Mounts") }}
-          {%- else -%}
-          {{ _("Parent Directory") }}
-          {%- endif -%}
-      </a></p>
+      <p id="breadcrumbs">
+	{%- for name, href in parents %}
+	/ <a href="{{href}}">{{ name }}</a>
+	{% endfor -%}
+      </p>
       <table id="dentries_table">
         <tr>
           <th></th>

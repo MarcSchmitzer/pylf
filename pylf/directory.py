@@ -67,8 +67,20 @@ def directory(context, request):
             url.fragment,
         )
         raise HTTPSeeOther(url.geturl())
+
+    parents = []
+    parent_parts = [
+        "Mounts",
+        context.dentry.mount.name
+    ]
+    parent_parts.extend(context.dentry.path.parts[:-1])
+    num_parents = len(parent_parts)
+    for lvl, part in enumerate(parent_parts):
+        parents.append((part, (num_parents-lvl)*"../"))
+
     return {
         'dentry': context.dentry,
+        'parents': parents,
         'children': context.dentry.listdir(),
         'show_hidden': asbool(request.params.get('show_hidden')),
     }
