@@ -7,7 +7,7 @@ corresponding view.
 from pathlib import PurePath as Path
 from urllib.parse import urlparse, ParseResult
 
-from pyramid.httpexceptions import HTTPNotFound, HTTPSeeOther
+import pyramid.httpexceptions as httpexceptions
 from pyramid.settings import asbool
 
 from .dentry import DirectoryDentry
@@ -30,7 +30,7 @@ class Directory:
         try:
             dentry = self.dentry.get_child(key)
         except FileNotFoundError:
-            raise HTTPNotFound(key)
+            return httpexceptions.HTTPNotFound(key)
 
         if isinstance(dentry, DirectoryDentry):
             return Directory(dentry)
@@ -70,7 +70,7 @@ def directory(context, request):
             url.query,
             url.fragment,
         )
-        raise HTTPSeeOther(url.geturl())
+        raise httpexceptions.HTTPSeeOther(url.geturl())
 
     parents = []
     parent_parts = [
