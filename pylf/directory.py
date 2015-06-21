@@ -89,6 +89,21 @@ def directory(context, request):
     }
 
 
+def upload_file(context, request):
+    dstname = request.params['content'].filename
+    try:
+        dentry = context.dentry.get_child(dstname)
+    except FileNotFoundError:
+        dentry = context.dentry.make_child(dstname)
+    else:
+        if isinstance(dentry, DirectoryDentry):
+            return httpexceptions.HTTPConflict()
+        if not request.has_permission("replace_file"):
+            return httpexceptions.HTTPForbidden()
+    dentry.write(request.params['content'].file)
+    return httpexceptions.HTTPSeeOther(request.url)  # Map to GET
+
+
 def includeme(config):
     """Setup function.
 
@@ -100,4 +115,11 @@ def includeme(config):
         request_method="GET",
         renderer="templates/directory.jinja2",
         permission="browse",
+    )
+    config.add_view(
+        upload_file,
+        context=Directory,
+        request_method="POST",
+        renderer="templates/directory.jinja2",
+        permission="create_file",
     )
