@@ -97,6 +97,7 @@ def includeme(config):
     config.add_view(
         directory,
         context=Directory,
+        request_method="GET",
         renderer="templates/directory.jinja2",
         permission="browse",
     )
