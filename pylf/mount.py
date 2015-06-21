@@ -36,3 +36,10 @@ class Mount:
         userdb_cfg = cfg["userdb"]
         userdb_cls = self.userdbs[userdb_cfg["type"]]
         self.userdb = userdb_cls.from_config(userdb_cfg)
+
+    def __repr__(self):
+        return "{}({!r}, backend={!r})".format(
+            type(self).__name__,
+            self.name,
+            self.backend,
+        )
