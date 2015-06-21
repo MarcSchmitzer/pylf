@@ -51,6 +51,9 @@ class FileDentry(Dentry):
     def make_response(self, request):
         return self.mount.backend.file_response(self.path, request)
 
+    def write(self, fp):
+        return self.mount.backend.write_file(self.path, fp)
+
 
 class DirectoryDentry(Dentry):
     mimetype = ("inode/directory", None)
