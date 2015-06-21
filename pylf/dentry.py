@@ -77,7 +77,25 @@ class DirectoryDentry(Dentry):
             yield self._make_dentry(path)
 
     def get_child(self, name):
+        """Get a `Dentry` instance for a child of this directory.
+
+        Raises `FileNotFoundError` if the child does not exist.
+        """
         return self._make_dentry(self.path / name)
+
+    def make_child(self, name, directory=False):
+        """Create a `Dentry` instance for a child of this directory.
+
+        This will work regardless of whether the child or this
+        directory exists.
+
+        Args:
+          directory (bool): `True` if the child is supposed to
+          be a directory.
+        """
+        if directory:
+            return DirectoryDentry(self.mount, self.path / name)
+        return FileDentry(self.mount, self.path / name, stat_res=None)
 
 
 def make_root(mount):
