@@ -45,6 +45,10 @@ class Directory:
         )
 
     @property
+    def mount(self):
+        return self.dentry.mount
+
+    @property
     def path(self):
         """The path of the directory."""
         return self.dentry.path

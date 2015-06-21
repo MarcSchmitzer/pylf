@@ -12,12 +12,12 @@ class AuthnPolicy(BasicAuthAuthenticationPolicy):
         )
 
     def forget(self, request):
-        realm = request.context.dentry.mount.auth_realm
+        realm = request.context.mount.auth_realm
         return [('WWW-Authenticate', 'Basic realm="%s"' % realm)]
 
 
 def check_auth(username, password, request):
-    userdb = request.context.dentry.mount.userdb
+    userdb = request.context.mount.userdb
     if userdb.authenticate(username, password):
         return ()
     return None
