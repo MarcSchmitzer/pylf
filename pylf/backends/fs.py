@@ -29,3 +29,11 @@ class FSBackend:
 
     def file_response(self, path, request=None):
         return FileResponse(str(self.root / path), request=request)
+
+    def write_file(self, path, fp):
+        with (self.root / path).open('wb') as dst:
+            while True:
+                block = fp.read(1024)
+                if not block:
+                    break
+                dst.write(block)
