@@ -24,7 +24,7 @@
         </tr>
         {%- for child in children -%}
 	{%- if show_hidden or not child.hidden %}
-        <tr class="{{ loop.cycle('dentry_odd_row', 'dentry_even_row') }}">
+        <tr class="{{ loop.cycle('dentry_odd_row', 'dentry_even_row') }}" id="{{ child.name|str_to_id }}">
           <td>{{ macros.dentry_icon(request, child) }}</td>
           <td class="dentry_name_col"><a href="{{child.relpath}}">{{ child.name }}</a></td>
           <td class="dentry_size_col">{{ child.size|fmt_size }}</td>
