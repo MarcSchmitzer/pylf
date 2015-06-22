@@ -62,6 +62,19 @@ def str_to_id(s):
     return "".join(res)
 
 
+def urlmod(url, **kwargs):
+    """Return a modified version of `url`.
+
+    Replaces parts of `url` as specified by the keyword arguments
+    and returns the result. Supported the keyword arguments are the
+    fields of `urllib.parse.ParseResult`.
+
+    Example::
+        urlmod("http://example.com", scheme="https") -> "https://example.com"
+    """
+    return urlparse(url)._replace(**kwargs).geturl()
+
+
 def includeme(config):
     """Setup function.
 
