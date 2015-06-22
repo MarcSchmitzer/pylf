@@ -7,7 +7,7 @@ corresponding view.
 from pathlib import PurePath as Path
 from urllib.parse import urlparse, ParseResult
 
-from pyramid.httpexceptions import HTTPNotFound, HTTPSeeOther
+import pyramid.httpexceptions as httpexceptions
 from pyramid.settings import asbool
 
 from .dentry import DirectoryDentry
@@ -30,7 +30,7 @@ class Directory:
         try:
             dentry = self.dentry.get_child(key)
         except FileNotFoundError:
-            raise HTTPNotFound(key)
+            return httpexceptions.HTTPNotFound(key)
 
         if isinstance(dentry, DirectoryDentry):
             return Directory(dentry)
@@ -43,6 +43,10 @@ class Directory:
             if self.is_root
             else self.dentry.path.name
         )
+
+    @property
+    def mount(self):
+        return self.dentry.mount
 
     @property
     def path(self):
@@ -66,7 +70,7 @@ def directory(context, request):
             url.query,
             url.fragment,
         )
-        raise HTTPSeeOther(url.geturl())
+        raise httpexceptions.HTTPSeeOther(url.geturl())
 
     parents = []
     parent_parts = [
@@ -85,6 +89,23 @@ def directory(context, request):
     }
 
 
+def upload_file(context, request):
+    dstname = request.params["filename"]
+    if not dstname:
+        dstname = request.params['content'].filename
+    try:
+        dentry = context.dentry.get_child(dstname)
+    except FileNotFoundError:
+        dentry = context.dentry.make_child(dstname)
+    else:
+        if isinstance(dentry, DirectoryDentry):
+            return httpexceptions.HTTPConflict()
+        if not request.has_permission("replace_file"):
+            return httpexceptions.HTTPForbidden()
+    dentry.write(request.params['content'].file)
+    return httpexceptions.HTTPSeeOther(request.url)  # Map to GET
+
+
 def includeme(config):
     """Setup function.
 
@@ -93,6 +114,14 @@ def includeme(config):
     config.add_view(
         directory,
         context=Directory,
+        request_method="GET",
         renderer="templates/directory.jinja2",
         permission="browse",
+    )
+    config.add_view(
+        upload_file,
+        context=Directory,
+        request_method="POST",
+        renderer="templates/directory.jinja2",
+        permission="create_file",
     )
