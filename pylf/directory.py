@@ -90,7 +90,9 @@ def directory(context, request):
 
 
 def upload_file(context, request):
-    dstname = request.params['content'].filename
+    dstname = request.params["filename"]
+    if not dstname:
+        dstname = request.params['content'].filename
     try:
         dentry = context.dentry.get_child(dstname)
     except FileNotFoundError:

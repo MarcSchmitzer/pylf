@@ -34,6 +34,7 @@
       <h2 id="upload_section">{{ _("Upload") }}</h2>
       <form name="upload" action="." method="post" accept-charset="utf-8" enctype="multipart/form-data">
         <input type="file" name="content" required>
+        <label for="filename">{{ _('Rename to') }}:</label><input type="text" name="filename">
         <input type="submit" value="{{ _('Upload') }}">
       </form>
     </div>
