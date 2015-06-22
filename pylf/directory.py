@@ -5,7 +5,6 @@ corresponding view.
 """
 
 from pathlib import PurePath as Path
-from urllib.parse import urlparse, ParseResult
 
 import pyramid.httpexceptions as httpexceptions
 from pyramid.settings import asbool
@@ -62,16 +61,8 @@ def directory(context, request):
     fixed path. This should not happen normally, though.
     """
     if not request.path.endswith("/"):
-        url = urlparse(request.url)
-        url = ParseResult(
-            url.scheme,
-            url.netloc,
-            url.path + "/",
-            url.params,
-            url.query,
-            url.fragment,
-        )
-        raise httpexceptions.HTTPSeeOther(url.geturl())
+        url = urlmod(request.url, path=request.path + "/")
+        raise httpexceptions.HTTPSeeOther(url)
 
     parents = []
     parent_parts = [
