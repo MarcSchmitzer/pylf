@@ -9,3 +9,7 @@
 {% macro favicon(request) -%}
 <link rel="icon" type="image/png" href="{{ request.icon_path(('inode/directory', None)) }}">
 {%- endmacro %}
+
+{% macro static_meta() -%}
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+{%- endmacro %}

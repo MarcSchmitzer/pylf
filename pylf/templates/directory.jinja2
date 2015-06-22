@@ -2,6 +2,7 @@
 {% import 'macros.jinja2' as macros -%}
 <html lang="{{request.locale_name}}">
   <head>
+    {{ macros.static_meta() }}
     {{ macros.favicon(request) }}
     {{ macros.stylesheet(request, 'default') }}
     <title>{{ dentry.name }} - PYLF</title>
