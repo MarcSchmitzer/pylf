@@ -12,6 +12,7 @@ from pyramid.settings import asbool
 
 from .dentry import DirectoryDentry
 from .file import File
+from .util import str_to_id, urlmod
 
 
 class Directory:
@@ -103,7 +104,9 @@ def upload_file(context, request):
         if not request.has_permission("replace_file"):
             return httpexceptions.HTTPForbidden()
     dentry.write(request.params['content'].file)
-    return httpexceptions.HTTPSeeOther(request.url)  # Map to GET
+
+    url = urlmod(request.url, fragment=str_to_id(dstname))
+    return httpexceptions.HTTPSeeOther(url)  # Map to GET
 
 
 def includeme(config):
