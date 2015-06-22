@@ -1,11 +1,13 @@
 """Utility functions."""
 
+from string import ascii_letters, digits
 from urllib.parse import urlparse
 
 from jinja2 import Markup
 
 
 _SIZE_SUFFIXES = ("B", "KB", "MB", "GB", "TB", "PB")
+_ID_CHARS = frozenset(ascii_letters + digits + "-_.")
 
 
 def fmt_size(size):
@@ -42,13 +44,33 @@ def rel_path(request, abspath):
     return res_path
 
 
+def str_to_id(s):
+    """Return a string usable as an html element id for `s`.
+
+    Replaces non-usable chars in `s` with a hopefully-unique substitute.
+
+    NOTE: This is not entirely collision-proof, but will probably work
+      most of the time.
+    """
+    id_chars = _ID_CHARS
+    res = []
+    for c in s:
+        if c in id_chars:
+            res.append(c)
+        else:
+            res.append("_{:x}_".format(ord(c)))
+    return "".join(res)
+
+
 def includeme(config):
     """Setup function.
 
     Registers:
       * `fmt_size` as a jinja filter
+      * `str_to_id` as a jinja filter
       * `rel_path` as a request method
     """
     config.add_request_method(rel_path)
     j2env = config.get_jinja2_environment()
     j2env.filters["fmt_size"] = fmt_size
+    j2env.filters["str_to_id"] = str_to_id
