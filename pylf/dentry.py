@@ -70,10 +70,7 @@ class DirectoryDentry(Dentry):
         return FileDentry(self.mount, path, stat_res=stat_res)
 
     def listdir(self):
-        for path in sorted(
-            self.mount.backend.listdir(self.path),
-            key=lambda p: str(p).lower(),
-        ):
+        for path in self.mount.backend.listdir(self.path):
             yield self._make_dentry(path)
 
     def get_child(self, name):

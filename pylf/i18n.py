@@ -2,6 +2,8 @@
 from pyramid.i18n import default_locale_negotiator
 from webob.acceptparse import Accept
 
+from icu import Locale, Collator
+
 
 class LocaleNegotiator:
     """Locale negotiator that supports the "Accept-Language" HTTP
@@ -45,6 +47,17 @@ class LocaleNegotiator:
         return loc
 
 
+def make_collator(request):
+    loc = Locale.createFromName(request.locale_name)
+    return Collator.createInstance(loc)
+
+
 def includeme(config):
     negotiator = LocaleNegotiator.from_settings(config.get_settings())
     config.set_locale_negotiator(negotiator)
+    config.add_request_method(
+        make_collator,
+        "collator",
+        property=True,
+        reify=True,
+    )

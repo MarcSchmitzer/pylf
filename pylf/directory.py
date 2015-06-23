@@ -73,10 +73,15 @@ def directory(context, request):
     for lvl, part in enumerate(parent_parts):
         parents.append((part, (num_parents-lvl)*"../"))
 
+    children = sorted(
+        context.dentry.listdir(),
+        key=lambda dentry: request.collator.getSortKey(str(dentry.path)),
+    )
+
     return {
         'dentry': context.dentry,
         'parents': parents,
-        'children': context.dentry.listdir(),
+        'children': children,
         'show_hidden': asbool(request.params.get('show_hidden')),
     }
 
