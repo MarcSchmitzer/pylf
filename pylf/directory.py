@@ -79,7 +79,6 @@ def directory(context, request):
     )
 
     return {
-        'dentry': context.dentry,
         'parents': parents,
         'children': children,
         'show_hidden': asbool(request.params.get('show_hidden')),
