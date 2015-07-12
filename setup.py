@@ -5,13 +5,16 @@ from setuptools import setup, find_packages
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
-
 requires = [
-    'pyramid>=1.0.2',
-    'pyramid_jinja2',
-    'pyramid_debugtoolbar',
-    'waitress'
+    "Babel>=1.3",
+    "Jinja2>=2.7",
+    "PyICU>=1.9",
+    "pyramid>=1.5",
+    "pyramid-jinja2>=2.5",
+    "simplepam>=0.1",
+    "WebOb>=1.4",
 ]
+
 
 setup(name='pylf',
       version='0.0',
