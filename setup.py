@@ -1,6 +1,5 @@
 import os
 
-from babel.messages import frontend as babel
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -38,10 +37,4 @@ setup(name='pylf',
       [paste.app_factory]
       main = pylf:main
       """,
-      cmdclass = {
-          'compile_catalog': babel.compile_catalog,
-          'extract_messages': babel.extract_messages,
-          'init_catalog': babel.init_catalog,
-          'update_catalog': babel.update_catalog,
-      },
 )
