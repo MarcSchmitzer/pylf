@@ -1,4 +1,6 @@
 *~
 /*.egg-info/
+/build/
+/dist/
 /mounts.d
 __pycache__/
