@@ -27,13 +27,3 @@ class InlineAuthenticator(dict):
         if digest.digest() != b64decode(pw["hash"]):
             return None
         return account
-
-
-if __name__ == "__main__":
-    import getpass, sys, configparser
-    cfg = configparser.ConfigParser()
-    cfg.read(sys.argv[1])
-    cfg = cfg["authentication"]
-    authn = InlineAuthenticator.from_config(cfg)
-    login, password = input("Login: "), getpass.getpass()
-    print(authn(login, password))

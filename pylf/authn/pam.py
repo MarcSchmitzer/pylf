@@ -20,11 +20,3 @@ class PamAuthenticator:
                 "name": account.pw_gecos,
             }
         return None
-    
-
-if __name__ == "__main__":
-    from getpass import getpass
-    authn = PamAuthenticator()
-    login = input("Login: ")
-    password = getpass()
-    print(authn(login, password))
