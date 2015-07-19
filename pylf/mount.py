@@ -17,26 +17,30 @@ class Mount:
     def from_file(cls, path):
         """Create an instance based on the configuration file at `path`."""
         name = os.path.basename(path).split(".", 1)[0]
-        parser = SafeConfigParser()
-        parser.read([path])
-        cfg = {
-            section: dict(parser.items(section))
-            for section in parser.sections()
-        }
-        return cls(name, cfg)
+        cfg = SafeConfigParser()
+        cfg.read([path])
+        return cls.from_config(name, cfg)
 
-    def __init__(self, name, cfg):
-        self.name = name
-
+    @classmethod
+    def from_config(cls, name, cfg):
         backend_cfg = cfg["backend"]
-        backend_cls = self.backends[backend_cfg["type"]]
-        self.backend = backend_cls.from_config(backend_cfg)
-
-        self.auth_realm = cfg["auth"]["realm"]
+        backend_cls = cls.backends[backend_cfg["type"]]
+        backend = backend_cls.from_config(backend_cfg)
 
         authn_cfg = cfg["authentication"]
-        authr_cls = self.authenticators[authn_cfg["type"]]
-        self.userdb = UserDB(authr_cls.from_config(authn_cfg))
+        authr_cls = cls.authenticators[authn_cfg["type"]]
+        userdb = UserDB(authr_cls.from_config(authn_cfg))
+
+        return cls(
+            name,
+            backend=backend,
+            userdb=userdb,
+        )
+
+    def __init__(self, name, backend, userdb):
+        self.name = name
+        self.backend = backend
+        self.userdb = userdb
 
     def __repr__(self):
         return "{}({!r}, backend={!r})".format(
