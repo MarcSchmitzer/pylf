@@ -4,13 +4,14 @@ import os
 from configparser import SafeConfigParser
 
 from .plugins import Plugins
+from .userdb import UserDB
 
 
 class Mount:
     """Represents a single configured mount."""
 
     backends = Plugins("pylf.backends")
-    userdbs = Plugins("pylf.userdbs")
+    authenticators = Plugins("pylf.authn")
 
     @classmethod
     def from_file(cls, path):
@@ -33,9 +34,9 @@ class Mount:
 
         self.auth_realm = cfg["auth"]["realm"]
 
-        userdb_cfg = cfg["userdb"]
-        userdb_cls = self.userdbs[userdb_cfg["type"]]
-        self.userdb = userdb_cls.from_config(userdb_cfg)
+        authn_cfg = cfg["authentication"]
+        authr_cls = self.authenticators[authn_cfg["type"]]
+        self.userdb = UserDB(authr_cls.from_config(authn_cfg))
 
     def __repr__(self):
         return "{}({!r}, backend={!r})".format(
