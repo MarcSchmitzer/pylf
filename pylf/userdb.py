@@ -46,20 +46,3 @@ class UserDB(dict):
                 "hash": b64encode(digest.digest()),
             }
         self[login] = account
-
-            
-if __name__ == "__main__":
-    import getpass, sys, configparser
-    from plugins import Plugins
-    cfg = configparser.ConfigParser()
-    cfg.read(sys.argv[1])
-    cfg = cfg["authentication"]
-    authn_plugins = Plugins("authn")
-    Authn = authn_plugins[cfg["type"]]
-    authn = Authn.from_config(cfg)
-    userdb = UserDB(authn)
-    login, password = input("Login: "), getpass.getpass()
-    print("Authenticate:", userdb.authenticate(login, password))
-    print("DB:",  userdb)
-    print("Re-authenticate:", userdb.authenticate(login, password))
-    
