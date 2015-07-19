@@ -3,8 +3,6 @@
 import pwd
 import simplepam
 
-from functools import lru_cache
-
 __plugin__ = "PamAuthenticator"
 
 

@@ -2,8 +2,9 @@
 
 import hashlib
 
-from base64 import b64decode
 from json import loads
+
+from .util import check_password
 
 
 __plugin__ = "InlineAuthenticator"
@@ -20,10 +21,6 @@ class InlineAuthenticator(dict):
         except KeyError:
             return None
 
-        pw = account["password"]
-        digest = hashlib.new(pw["type"])
-        digest.update(b64decode(pw["salt"]))
-        digest.update(password.encode("utf8"))
-        if digest.digest() != b64decode(pw["hash"]):
-            return None
-        return account
+        if check_password(account["password"], password):
+            return account
+        return None
