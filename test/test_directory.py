@@ -1,7 +1,6 @@
 
 from pathlib import Path
 
-from pyramid.httpexceptions import HTTPNotFound
 from pytest import fixture, raises
 
 from pylf.backends.fs import FSBackend
@@ -78,5 +77,5 @@ def test_directory_getitem_notfound(mount):
     child_name = "frob"
     (root / path).mkdir(parents=True)
     directory = Directory(dentry)
-    resp = directory[child_name]
-    assert isinstance(resp, HTTPNotFound)
+    with raises(KeyError):
+        directory[child_name]

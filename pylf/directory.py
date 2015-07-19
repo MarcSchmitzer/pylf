@@ -30,7 +30,7 @@ class Directory:
         try:
             dentry = self.dentry.get_child(key)
         except FileNotFoundError:
-            return httpexceptions.HTTPNotFound(key)
+            raise KeyError(key)
 
         if isinstance(dentry, DirectoryDentry):
             return Directory(dentry)
