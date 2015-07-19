@@ -1,6 +1,8 @@
 *~
+.coverage
 /*.egg-info/
 /build/
 /dist/
+/htmlcov/
 /mounts.d
 __pycache__/
