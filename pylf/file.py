@@ -8,13 +8,20 @@ class File:
     def __init__(self, dentry):
         self.dentry = dentry
 
+    @property
+    def path(self):
+        return self.dentry.path
+
+    def make_response(self, request):
+        return self.dentry.mount.backend.file_response(self.path, request)
+
 
 def file_(context, request):
     """View for file resources.
 
     Returns the contents of the file.
     """
-    return context.dentry.make_response(request)
+    return context.make_response(request)
 
 
 def includeme(config):

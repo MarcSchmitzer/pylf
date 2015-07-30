@@ -53,6 +53,15 @@ class Directory:
         """The path of the directory."""
         return self.dentry.path
 
+    def get_children(self):
+        return self.dentry.listdir()
+
+    def get_child(self, name):
+        return self.dentry.get_child(name)
+
+    def make_child(self, name, directory=False):
+        return self.dentry.make_child(name, directory=directory)
+
 
 def directory(context, request):
     """Directory view.
@@ -66,15 +75,15 @@ def directory(context, request):
 
     parents = []
     parent_parts = [
-        context.dentry.mount.name
+        context.mount.name,
     ]
-    parent_parts.extend(context.dentry.path.parts[:-1])
+    parent_parts.extend(context.path.parts[:-1])
     num_parents = len(parent_parts)
     for lvl, part in enumerate(parent_parts):
         parents.append((part, (num_parents-lvl)*"../"))
 
     children = sorted(
-        context.dentry.listdir(),
+        context.get_children(),
         key=lambda dentry: request.collator.getSortKey(str(dentry.path)),
     )
 
@@ -90,9 +99,9 @@ def upload_file(context, request):
     if not dstname:
         dstname = request.params['content'].filename
     try:
-        dentry = context.dentry.get_child(dstname)
+        dentry = context.get_child(dstname)
     except FileNotFoundError:
-        dentry = context.dentry.make_child(dstname)
+        dentry = context.make_child(dstname)
     else:
         if isinstance(dentry, DirectoryDentry):
             return httpexceptions.HTTPConflict()
