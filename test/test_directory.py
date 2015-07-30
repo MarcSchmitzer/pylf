@@ -37,6 +37,7 @@ def mount(tmpdir):
         "dummy",
         backend=backend,
         userdb=userdb,
+        auth_realm="AUTH_REALM",
     )
 
 

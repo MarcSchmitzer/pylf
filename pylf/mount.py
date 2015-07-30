@@ -35,12 +35,14 @@ class Mount:
             name,
             backend=backend,
             userdb=userdb,
+            auth_realm=cfg["auth"]["realm"],
         )
 
-    def __init__(self, name, backend, userdb):
+    def __init__(self, name, backend, userdb, auth_realm):
         self.name = name
         self.backend = backend
         self.userdb = userdb
+        self.auth_realm = auth_realm
 
     def __repr__(self):
         return "{}({!r}, backend={!r})".format(
