@@ -9,7 +9,7 @@ from pytest import fixture, raises
 import pyramid.testing as testing
 
 from pylf.backends.fs import FSBackend
-from pylf.dentry import DirectoryDentry, FileDentry
+from pylf.dentry import DirectoryDentry
 from pylf.file import File
 from pylf.mount import Mount
 from pylf.directory import Directory

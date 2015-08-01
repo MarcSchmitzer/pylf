@@ -10,7 +10,7 @@ import stat
 import pyramid.httpexceptions as httpexceptions
 from pyramid.settings import asbool
 
-from .dentry import FileDentry, DirectoryDentry
+from .dentry import DirectoryDentry
 from .file import File
 from .util import str_to_id, urlmod
 
@@ -61,7 +61,7 @@ class Directory:
         stat_res = self.mount.backend.stat(path)
         if stat_res.st_mode & stat.S_IFDIR:
             return Directory(DirectoryDentry(self.mount, path))
-        return File(FileDentry(self.mount, path, stat_res=stat_res))
+        return File(self.mount, path, stat_res=stat_res)
 
     def get_children(self):
         for path in self.mount.backend.listdir(self.path):
@@ -74,7 +74,7 @@ class Directory:
         path = self.path / name
         if directory:
             return Directory(DirectoryDentry(self.mount, path))
-        return File(FileDentry(self.mount, path, stat_res=None))
+        return File(self.mount, path, stat_res=None)
 
 
 def directory(context, request):

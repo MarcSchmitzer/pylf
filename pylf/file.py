@@ -10,10 +10,10 @@ class File:
     """Resource representing files."""
     _mimetype = None
 
-    def __init__(self, dentry):
-        self.mount = dentry.mount
-        self.path = dentry.path
-        self.stat_res = dentry.stat_res
+    def __init__(self, mount, path, stat_res):
+        self.mount = mount
+        self.path = path
+        self.stat_res = stat_res
     
     def make_response(self, request):
         return self.mount.backend.file_response(self.path, request)
