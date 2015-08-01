@@ -6,18 +6,12 @@ Provides the `File` resource and corresponding view.
 class File:
     """Resource representing files."""
     def __init__(self, dentry):
-        self.dentry = dentry
-
-    @property
-    def mount(self):
-        return self.dentry.mount
-    
-    @property
-    def path(self):
-        return self.dentry.path
+        self.mount = dentry.mount
+        self.path = dentry.path
+        self.stat_res = dentry.stat_res
     
     def make_response(self, request):
-        return self.dentry.mount.backend.file_response(self.path, request)
+        return self.mount.backend.file_response(self.path, request)
 
 
 def file_(context, request):

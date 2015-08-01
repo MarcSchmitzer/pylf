@@ -81,8 +81,8 @@ def test_directory_getitem_file(mount):
     directory = Directory(dentry)
     child = directory[child_name]
     assert isinstance(child, File)
-    assert child.dentry.mount is mount
-    assert child.dentry.path == path / child_name
+    assert child.mount is mount
+    assert child.path == path / child_name
 
 
 def test_directory_getitem_notfound(mount):
