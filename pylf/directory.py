@@ -20,6 +20,9 @@ class Directory:
 
     Child resources are either instances of this class or `file.File`.
     """
+    mimetype = ("inode/directory", None)
+    size = None
+
     def __init__(self, dentry):
         self.mount = dentry.mount
         self.path = dentry.path
@@ -34,13 +37,9 @@ class Directory:
 
     def __getitem__(self, key):
         try:
-            child = self.get_child(key)
+            return self.get_child(key)
         except FileNotFoundError:
             raise KeyError(key)
-
-        if isinstance(child, DirectoryDentry):
-            return Directory(child)
-        return File(child)
 
     @property
     def name(self):
@@ -50,11 +49,19 @@ class Directory:
             else self.path.name
         )
 
+    @property
+    def relpath(self):
+        return self.name + "/"
+
+    @property
+    def hidden(self):
+        return self.name.startswith(".")
+
     def _make_dentry(self, path):
         stat_res = self.mount.backend.stat(path)
         if stat_res.st_mode & stat.S_IFDIR:
-            return DirectoryDentry(self.mount, path)
-        return FileDentry(self.mount, path, stat_res=stat_res)
+            return Directory(DirectoryDentry(self.mount, path))
+        return File(FileDentry(self.mount, path, stat_res=stat_res))
 
     def get_children(self):
         for path in self.mount.backend.listdir(self.path):
@@ -64,9 +71,10 @@ class Directory:
         return self._make_dentry(self.path / name)
 
     def make_child(self, name, directory=False):
+        path = self.path / name
         if directory:
-            return DirectoryDentry(self.mount, self.path / name)
-        return FileDentry(self.mount, self.path / name, stat_res=None)
+            return Directory(DirectoryDentry(self.mount, path))
+        return File(FileDentry(self.mount, path, stat_res=None))
 
 
 def directory(context, request):
@@ -105,15 +113,15 @@ def upload_file(context, request):
     if not dstname:
         dstname = request.params['content'].filename
     try:
-        dentry = context.get_child(dstname)
+        child = context.get_child(dstname)
     except FileNotFoundError:
-        dentry = context.make_child(dstname)
+        child = context.make_child(dstname)
     else:
-        if isinstance(dentry, DirectoryDentry):
+        if isinstance(child, Directory):
             return httpexceptions.HTTPConflict()
         if not request.has_permission("replace_file"):
             return httpexceptions.HTTPForbidden()
-    dentry.write(request.params['content'].file)
+    child.write(request.params['content'].file)
 
     url = urlmod(request.url, fragment=str_to_id(dstname))
     return httpexceptions.HTTPSeeOther(url)  # Map to GET

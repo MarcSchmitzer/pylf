@@ -127,11 +127,11 @@ def test_view(mount, context):
     assert len(children) == 2
     child = children[0]
     assert child.name == "childdir"
-    assert isinstance(child, DirectoryDentry)
+    assert isinstance(child, Directory)
 
     child = children[1]
     assert child.name == "childfile"
-    assert isinstance(child, FileDentry)
+    assert isinstance(child, File)
 
 
 def test_view_redirect_trailing_slash(mount):
