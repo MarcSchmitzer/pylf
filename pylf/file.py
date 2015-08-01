@@ -9,9 +9,13 @@ class File:
         self.dentry = dentry
 
     @property
+    def mount(self):
+        return self.dentry.mount
+    
+    @property
     def path(self):
         return self.dentry.path
-
+    
     def make_response(self, request):
         return self.dentry.mount.backend.file_response(self.path, request)
 
