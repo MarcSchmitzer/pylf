@@ -9,7 +9,6 @@ from pytest import fixture, raises
 import pyramid.testing as testing
 
 from pylf.backends.fs import FSBackend
-from pylf.dentry import DirectoryDentry
 from pylf.file import File
 from pylf.mount import Mount
 from pylf.directory import Directory
@@ -44,12 +43,11 @@ def mount(tmpdir):
 def test_directory_basic(mount):
     root = Path(mount.backend.root)
     path = Path("foo/bar")
-    dentry = DirectoryDentry(mount, path)
-    directory = Directory(dentry)
+    directory = Directory(mount, path)
     (root / path).mkdir(parents=True)
     assert not directory.is_root
     assert str(path) in repr(directory)
-    assert directory.name == dentry.path.name
+    assert directory.name == directory.path.name
     assert directory.mount is mount
     assert directory.path == path
 
@@ -57,11 +55,10 @@ def test_directory_basic(mount):
 def test_directory_getitem_dir(mount):
     root = Path(mount.backend.root)
     path = Path("foo/bar")
-    dentry = DirectoryDentry(mount, path)
     child_name = "frob"
     child_path = (root / path / child_name)
     child_path.mkdir(parents=True)
-    directory = Directory(dentry)
+    directory = Directory(mount, path)
     child = directory[child_name]
     assert isinstance(child, Directory)
     assert child.mount is mount
@@ -71,13 +68,12 @@ def test_directory_getitem_dir(mount):
 def test_directory_getitem_file(mount):
     root = Path(mount.backend.root)
     path = Path("foo/bar")
-    dentry = DirectoryDentry(mount, path)
     child_name = "frob"
     child_path = (root / path / child_name)
     (root / path).mkdir(parents=True)
     with child_path.open("w") as f:
         pass
-    directory = Directory(dentry)
+    directory = Directory(mount, path)
     child = directory[child_name]
     assert isinstance(child, File)
     assert child.mount is mount
@@ -87,10 +83,9 @@ def test_directory_getitem_file(mount):
 def test_directory_getitem_notfound(mount):
     root = Path(mount.backend.root)
     path = Path("foo/bar")
-    dentry = DirectoryDentry(mount, path)
     child_name = "frob"
     (root / path).mkdir(parents=True)
-    directory = Directory(dentry)
+    directory = Directory(mount, path)
     with raises(KeyError):
         directory[child_name]
 
@@ -105,8 +100,7 @@ def context(mount):
     root = Path(mount.backend.root)
     path = Path("foo/bar")
     (root / path).mkdir(parents=True)
-    dentry = DirectoryDentry(mount, path)
-    return Directory(dentry)
+    return Directory(mount, path)
     
 
 def test_view(mount, context):

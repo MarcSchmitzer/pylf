@@ -9,7 +9,6 @@ import os
 
 from pyramid.settings import aslist
 
-from .dentry import make_root
 from .directory import Directory
 from .mount import Mount
 
@@ -34,7 +33,7 @@ class Mounts:
 
     def __getitem__(self, key):
         mount = self._items[key]
-        return Directory(make_root(mount))
+        return Directory.make_root(mount)
 
     def items(self):
         return self._items.items()

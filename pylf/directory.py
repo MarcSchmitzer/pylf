@@ -10,7 +10,6 @@ import stat
 import pyramid.httpexceptions as httpexceptions
 from pyramid.settings import asbool
 
-from .dentry import DirectoryDentry
 from .file import File
 from .util import str_to_id, urlmod
 
@@ -23,9 +22,13 @@ class Directory:
     mimetype = ("inode/directory", None)
     size = None
 
-    def __init__(self, dentry):
-        self.mount = dentry.mount
-        self.path = dentry.path
+    @classmethod
+    def make_root(cls, mount):
+        return cls(mount, Path())
+
+    def __init__(self, mount, path):
+        self.mount = mount
+        self.path = path
         self.is_root = (self.path == Path())
 
     def __repr__(self):
@@ -60,7 +63,7 @@ class Directory:
     def _make_dentry(self, path):
         stat_res = self.mount.backend.stat(path)
         if stat_res.st_mode & stat.S_IFDIR:
-            return Directory(DirectoryDentry(self.mount, path))
+            return Directory(self.mount, path)
         return File(self.mount, path, stat_res=stat_res)
 
     def get_children(self):
@@ -73,7 +76,7 @@ class Directory:
     def make_child(self, name, directory=False):
         path = self.path / name
         if directory:
-            return Directory(DirectoryDentry(self.mount, path))
+            return Directory(self.mount, path)
         return File(self.mount, path, stat_res=None)
 
 
