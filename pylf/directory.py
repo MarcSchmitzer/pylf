@@ -5,11 +5,12 @@ corresponding view.
 """
 
 from pathlib import PurePath as Path
+import stat
 
 import pyramid.httpexceptions as httpexceptions
 from pyramid.settings import asbool
 
-from .dentry import DirectoryDentry
+from .dentry import FileDentry, DirectoryDentry
 from .file import File
 from .util import str_to_id, urlmod
 
@@ -20,47 +21,52 @@ class Directory:
     Child resources are either instances of this class or `file.File`.
     """
     def __init__(self, dentry):
-        self.dentry = dentry
-        self.is_root = (self.dentry.path == Path())
+        self.mount = dentry.mount
+        self.path = dentry.path
+        self.is_root = (self.path == Path())
 
     def __repr__(self):
-        return "{}({!r})".format(type(self).__name__, self.dentry)
+        return "{}({!r}, {!r})".format(
+            type(self).__name__,
+            self.mount,
+            self.path,
+        )
 
     def __getitem__(self, key):
         try:
-            dentry = self.dentry.get_child(key)
+            child = self.get_child(key)
         except FileNotFoundError:
             raise KeyError(key)
 
-        if isinstance(dentry, DirectoryDentry):
-            return Directory(dentry)
-        return File(dentry)
+        if isinstance(child, DirectoryDentry):
+            return Directory(child)
+        return File(child)
 
     @property
     def name(self):
         return (
-            self.dentry.mount.name
+            self.mount.name
             if self.is_root
-            else self.dentry.path.name
+            else self.path.name
         )
 
-    @property
-    def mount(self):
-        return self.dentry.mount
-
-    @property
-    def path(self):
-        """The path of the directory."""
-        return self.dentry.path
+    def _make_dentry(self, path):
+        stat_res = self.mount.backend.stat(path)
+        if stat_res.st_mode & stat.S_IFDIR:
+            return DirectoryDentry(self.mount, path)
+        return FileDentry(self.mount, path, stat_res=stat_res)
 
     def get_children(self):
-        return self.dentry.listdir()
+        for path in self.mount.backend.listdir(self.path):
+            yield self._make_dentry(path)
 
     def get_child(self, name):
-        return self.dentry.get_child(name)
+        return self._make_dentry(self.path / name)
 
     def make_child(self, name, directory=False):
-        return self.dentry.make_child(name, directory=directory)
+        if directory:
+            return DirectoryDentry(self.mount, self.path / name)
+        return FileDentry(self.mount, self.path / name, stat_res=None)
 
 
 def directory(context, request):

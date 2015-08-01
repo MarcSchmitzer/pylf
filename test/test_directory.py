@@ -49,7 +49,6 @@ def test_directory_basic(mount):
     (root / path).mkdir(parents=True)
     assert not directory.is_root
     assert str(path) in repr(directory)
-    assert directory.dentry is dentry
     assert directory.name == dentry.path.name
     assert directory.mount is mount
     assert directory.path == path
@@ -65,7 +64,7 @@ def test_directory_getitem_dir(mount):
     directory = Directory(dentry)
     child = directory[child_name]
     assert isinstance(child, Directory)
-    assert child.dentry.mount is mount
+    assert child.mount is mount
     assert child.path == path / child_name
     
 
