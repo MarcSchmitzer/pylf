@@ -1,15 +1,11 @@
 """User database class."""
 
-import hashlib
-import random
-
-from base64 import b64decode, b64encode
-
 from .authn.util import check_password, make_hashdict
 
 
 class UserDB(dict):
     def __init__(self, authenticator):
+        dict.__init__(self)
         self.authenticator = authenticator
 
     def authenticate(self, login, password):

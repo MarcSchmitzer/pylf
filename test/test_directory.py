@@ -17,8 +17,8 @@ from pylf.directory import upload_file as upload_file_view
 from pylf.userdb import UserDB
 
 
-def dummy_auth(login, password):
-    return { "name": "Dummy User" }
+def dummy_auth(login, password):  # pylint: disable=unused-argument
+    return {"name": "Dummy User"}
 
 
 @fixture
@@ -63,7 +63,7 @@ def test_directory_getitem_dir(mount):
     assert isinstance(child, Directory)
     assert child.mount is mount
     assert child.path == path / child_name
-    
+
 
 def test_directory_getitem_file(mount):
     root = Path(mount.backend.root)
@@ -87,11 +87,12 @@ def test_directory_getitem_notfound(mount):
     (root / path).mkdir(parents=True)
     directory = Directory(mount, path)
     with raises(KeyError):
-        directory[child_name]
+        directory[child_name]  # pylint: disable=pointless-statement
 
 
 class DummyCollator:
-    def getSortKey(self, s):
+    @staticmethod
+    def getSortKey(s):  # pylint: disable=invalid-name
         return s
 
 
@@ -101,7 +102,7 @@ def context(mount):
     path = Path("foo/bar")
     (root / path).mkdir(parents=True)
     return Directory(mount, path)
-    
+
 
 def test_view(mount, context):
     root = Path(mount.backend.root)
@@ -128,7 +129,7 @@ def test_view(mount, context):
     assert isinstance(child, File)
 
 
-def test_view_redirect_trailing_slash(mount):
+def test_view_redirect_trailing_slash():
     request = DummyRequest(path="/foo/bar")
     with raises(HTTPSeeOther) as exc_info:
         directory_view(None, request)
@@ -204,7 +205,7 @@ def test_upload_file_replace_forbidden(testconfig, mount, context):
     root = Path(mount.backend.root)
     path = context.path
     fname = "baz"
-    respath = ( root / path / fname )
+    respath = (root / path / fname)
     with respath.open("w"):
         pass
     request = DummyRequest(

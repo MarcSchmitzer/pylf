@@ -14,7 +14,7 @@ class File:
         self.mount = mount
         self.path = path
         self.stat_res = stat_res
-    
+
     def make_response(self, request):
         return self.mount.backend.file_response(self.path, request)
 

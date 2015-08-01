@@ -25,7 +25,7 @@ def check_auth(username, password, request):
 
 class AuthzPolicy:
     def permits(self, context, principals, permission):
-        return (Authenticated in principals)   # FIXME
+        return Authenticated in principals   # FIXME
 
 
 def forbidden_view(request):

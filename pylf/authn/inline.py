@@ -1,7 +1,5 @@
 """User authenticator with accounts specified in the config file."""
 
-import hashlib
-
 from json import loads
 
 from .util import check_password

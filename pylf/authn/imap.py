@@ -36,7 +36,7 @@ class IMAPAuthenticator:
         try:
             imap.login(login, password)
         except imap.error as err:
-            self.log.debug("Login failed: {}".format(err))
+            self.log.debug("Login failed: %s", err)
             return None
-        return { "name": login }
+        return {"name": login}
 
