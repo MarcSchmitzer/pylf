@@ -5,11 +5,11 @@ corresponding view.
 """
 
 from pathlib import PurePath as Path
+import stat
 
 import pyramid.httpexceptions as httpexceptions
 from pyramid.settings import asbool
 
-from .dentry import DirectoryDentry
 from .file import File
 from .util import str_to_id, urlmod
 
@@ -19,39 +19,65 @@ class Directory:
 
     Child resources are either instances of this class or `file.File`.
     """
-    def __init__(self, dentry):
-        self.dentry = dentry
-        self.is_root = (self.dentry.path == Path())
+    mimetype = ("inode/directory", None)
+    size = None
+
+    @classmethod
+    def make_root(cls, mount):
+        return cls(mount, Path())
+
+    def __init__(self, mount, path):
+        self.mount = mount
+        self.path = path
+        self.is_root = (self.path == Path())
 
     def __repr__(self):
-        return "{}({!r})".format(type(self).__name__, self.dentry)
+        return "{}({!r}, {!r})".format(
+            type(self).__name__,
+            self.mount,
+            self.path,
+        )
 
     def __getitem__(self, key):
         try:
-            dentry = self.dentry.get_child(key)
+            return self.get_child(key)
         except FileNotFoundError:
             raise KeyError(key)
-
-        if isinstance(dentry, DirectoryDentry):
-            return Directory(dentry)
-        return File(dentry)
 
     @property
     def name(self):
         return (
-            self.dentry.mount.name
+            self.mount.name
             if self.is_root
-            else self.dentry.path.name
+            else self.path.name
         )
 
     @property
-    def mount(self):
-        return self.dentry.mount
+    def relpath(self):
+        return self.name + "/"
 
     @property
-    def path(self):
-        """The path of the directory."""
-        return self.dentry.path
+    def hidden(self):
+        return self.name.startswith(".")
+
+    def _make_dentry(self, path):
+        stat_res = self.mount.backend.stat(path)
+        if stat_res.st_mode & stat.S_IFDIR:
+            return Directory(self.mount, path)
+        return File(self.mount, path, stat_res=stat_res)
+
+    def get_children(self):
+        for path in self.mount.backend.listdir(self.path):
+            yield self._make_dentry(path)
+
+    def get_child(self, name):
+        return self._make_dentry(self.path / name)
+
+    def make_child(self, name, directory=False):
+        path = self.path / name
+        if directory:
+            return Directory(self.mount, path)
+        return File(self.mount, path, stat_res=None)
 
 
 def directory(context, request):
@@ -66,15 +92,15 @@ def directory(context, request):
 
     parents = []
     parent_parts = [
-        context.dentry.mount.name
+        context.mount.name,
     ]
-    parent_parts.extend(context.dentry.path.parts[:-1])
+    parent_parts.extend(context.path.parts[:-1])
     num_parents = len(parent_parts)
     for lvl, part in enumerate(parent_parts):
         parents.append((part, (num_parents-lvl)*"../"))
 
     children = sorted(
-        context.dentry.listdir(),
+        context.get_children(),
         key=lambda dentry: request.collator.getSortKey(str(dentry.path)),
     )
 
@@ -90,15 +116,15 @@ def upload_file(context, request):
     if not dstname:
         dstname = request.params['content'].filename
     try:
-        dentry = context.dentry.get_child(dstname)
+        child = context.get_child(dstname)
     except FileNotFoundError:
-        dentry = context.dentry.make_child(dstname)
+        child = context.make_child(dstname)
     else:
-        if isinstance(dentry, DirectoryDentry):
+        if isinstance(child, Directory):
             return httpexceptions.HTTPConflict()
         if not request.has_permission("replace_file"):
             return httpexceptions.HTTPForbidden()
-    dentry.write(request.params['content'].file)
+    child.write(request.params['content'].file)
 
     url = urlmod(request.url, fragment=str_to_id(dstname))
     return httpexceptions.HTTPSeeOther(url)  # Map to GET
