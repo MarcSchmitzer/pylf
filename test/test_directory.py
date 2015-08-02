@@ -6,8 +6,6 @@ from pyramid.httpexceptions import HTTPConflict, HTTPForbidden, HTTPSeeOther
 from pyramid.testing import DummyRequest, DummySecurityPolicy
 from pytest import fixture, raises
 
-import pyramid.testing as testing
-
 from pylf.backends.fs import FSBackend
 from pylf.file import File
 from pylf.mount import Mount
@@ -19,13 +17,6 @@ from pylf.userdb import UserDB
 
 def dummy_auth(login, password):  # pylint: disable=unused-argument
     return {"name": "Dummy User"}
-
-
-@fixture
-def testconfig(request):
-    config = testing.setUp()
-    request.addfinalizer(testing.tearDown)
-    return config
 
 
 @fixture
